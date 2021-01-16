@@ -1,7 +1,7 @@
-﻿id: a83ef0f4-dace-4767-bce3-ebd32599d2a0
-name: DNS tor proxies
+id: a83ef0f4-dace-4767-bce3-ebd32599d2a0
+name: DNS events related to ToR proxies
 description: |
-  'Identifies IPs performing DNS lookups associated with common Tor proxies.'
+  'Identifies IP addresses performing DNS lookups associated with common ToR proxies.'
 severity: Low
 requiredDataConnectors:
   - connectorId: DNS
@@ -26,3 +26,12 @@ query: |
   "tor2web.blutmagie.de", "onion.sh", "onion.lu", "onion.pet", "t2w.pw", "tor2web.ae.org", "tor2web.io", "tor2web.xyz", "onion.lt", 
   "s1.tor-gateways.de", "s2.tor-gateways.de", "s3.tor-gateways.de", "s4.tor-gateways.de", "s5.tor-gateways.de", "hiddenservice.net")
   | extend timestamp = TimeGenerated, IPCustomEntity = ClientIP, HostCustomEntity = Computer
+entityMappings:
+  - entityType: Host
+    fieldMappings:
+      - identifier: FullName
+        columnName: HostCustomEntity
+  - entityType: IP
+    fieldMappings:
+      - identifier: Address
+        columnName: IPCustomEntity

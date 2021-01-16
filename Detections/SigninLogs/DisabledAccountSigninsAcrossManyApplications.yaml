@@ -1,9 +1,9 @@
-﻿id: 75ea5c39-93e5-489b-b1e1-68fa6c9d2d04
+id: 75ea5c39-93e5-489b-b1e1-68fa6c9d2d04
 name: Attempts to sign in to disabled accounts
 description: |
   'Identifies failed attempts to sign in to disabled accounts across multiple Azure Applications.
   Default threshold for Azure Applications attempted to sign in to is 3.
-  References: https://docs.microsoft.com/en-us/azure/active-directory/reports-monitoring/reference-sign-ins-error-codes
+  References: https://docs.microsoft.com/azure/active-directory/reports-monitoring/reference-sign-ins-error-codes
   50057 - User account is disabled. The account has been disabled by an administrator.'
 severity: Medium
 requiredDataConnectors:
@@ -30,3 +30,12 @@ query: |
   applicationSet = makeset(AppDisplayName) by UserPrincipalName, IPAddress
   | where applicationCount >= threshold
   | extend timestamp = StartTimeUtc, AccountCustomEntity = UserPrincipalName, IPCustomEntity = IPAddress 
+entityMappings:
+  - entityType: Account
+    fieldMappings:
+      - identifier: FullName
+        columnName: AccountCustomEntity
+  - entityType: IP
+    fieldMappings:
+      - identifier: Address
+        columnName: IPCustomEntity

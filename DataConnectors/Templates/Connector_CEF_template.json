@@ -2,12 +2,12 @@
     "id": "ProviderNameApplianceName",
     "title": "PROVIDER NAME APPLIANCE NAME",
     "publisher": "PROVIDER NAME",
-    "descriptionMarkdown": "Common Event Format (CEF) is an industry standard format on top of Syslog messages, used by many security vendors to allow event interoperability among different platforms. By connecting your CEF logs to Azure Sentinel, you can take advantage of search & correlation, alerting, and threat intelligence enrichment for each log.​",
+    "descriptionMarkdown": "Common Event Format (CEF) is an industry standard format on top of Syslog messages, used by many security vendors to allow event interoperability among different platforms. By connecting your CEF logs to Azure Sentinel, you can take advantage of search & correlation, alerting, and threat intelligence enrichment for each log.",
     "graphQueries": [
         {
             "metricName": "Total data received",
             "legend": "DATATYPE_NAME",
-            "baseQuery": "\nCommonSecurityLog\n| where DeviceVendor == \"PROVIDER NAME\"\n| where DeviceProduct == \"APPLIANCE NAME\"\n"
+            "baseQuery": "CommonSecurityLog\n| where DeviceVendor == \"PROVIDER NAME\"\n| where DeviceProduct == \"APPLIANCE NAME\""
         }
     ],
     "sampleQueries": [
@@ -19,19 +19,20 @@
     "dataTypes": [
         {
             "name": "CommonSecurityLog (DATATYPE_NAME)",
-            "lastDataReceivedQuery": "\nCommonSecurityLog\n| where DeviceVendor == \"PROVIDER NAME\"\n| where DeviceProduct == \"APPLIANCE NAME\"\n\n            | summarize Time = max(TimeGenerated)\n            | where isnotempty(Time)"
+            "lastDataReceivedQuery": "CommonSecurityLog\n| where DeviceVendor == \"PROVIDER NAME\"\n| where DeviceProduct == \"APPLIANCE NAME\"\n| summarize Time = max(TimeGenerated)\n| where isnotempty(Time)"
         }
     ],
     "connectivityCriterias": [
         {
             "type": "IsConnectedQuery",
             "value": [
-                "\nCommonSecurityLog\n| where DeviceVendor == \"PROVIDER NAME\"\n| where DeviceProduct == \"APPLIANCE NAME\"\n\n            | summarize LastLogReceived = max(TimeGenerated)\n            | project IsConnected = LastLogReceived > ago(30d)"
+                "CommonSecurityLog\n| where DeviceVendor == \"PROVIDER NAME\"\n| where DeviceProduct == \"APPLIANCE NAME\"\n| summarize LastLogReceived = max(TimeGenerated)\n| project IsConnected = LastLogReceived > ago(30d)"
             ]
         }
     ],
     "availability": {
-        "status": 1
+        "status": 1,
+        "isPreview": true
     },
     "permissions": {
         "resourceProvider": [
@@ -44,6 +45,15 @@
                     "read": true,
                     "write": true,
                     "delete": true
+                }
+            },
+            {
+                "provider": "Microsoft.OperationalInsights/workspaces/sharedKeys",
+                "permissionsDisplayText": "read permissions to shared keys for the workspace are required. [See the documentation to learn more about workspace keys](https://docs.microsoft.com/azure/azure-monitor/platform/agent-windows#obtain-workspace-id-and-key).",
+                "providerDisplayName": "Keys",
+                "scope": "Workspace",
+                "requiredPermissions": {
+                    "action": true
                 }
             }
         ]
@@ -59,7 +69,7 @@
                 },
                 {
                     "title": "1.2 Install the CEF collector on the Linux machine",
-                    "description": "Install the Microsoft Monitoring Agent on your Linux machine and configure the machine to listen on the necessary port and forward messages to your Azure Sentinel workspace. The CEF collector collects CEF messages on port 514 TCP.\n\n> 1. Make sure that you have Python on your machine using the following command: python --version.\n\n> 2. You must have elevated permissions (sudo) on your machine.",
+                    "description": "Install the Microsoft Monitoring Agent on your Linux machine and configure the machine to listen on the necessary port and forward messages to your Azure Sentinel workspace. The CEF collector collects CEF messages on port 514 TCP.\n\n> 1. Make sure that you have Python on your machine using the following command: python -version.\n\n> 2. You must have elevated permissions (sudo) on your machine.",
                     "instructions": [
                         {
                             "parameters": {
@@ -68,7 +78,7 @@
                                     "PrimaryKey"
                                 ],
                                 "label": "Run the following command to install and apply the CEF collector:",
-                                "value": "sudo wget https://raw.githubusercontent.com/Azure/Azure-Sentinel/master/DataConnectors/CEF/cef_installer.py&&sudo python cef_installer.py {0} {1}"
+                                "value": "sudo wget -O cef_installer.py https://raw.githubusercontent.com/Azure/Azure-Sentinel/master/DataConnectors/CEF/cef_installer.py&&sudo python cef_installer.py {0} {1}"
                             },
                             "type": "CopyableLabel"
                         }
@@ -78,11 +88,11 @@
         },
         {
             "title": "2. Forward Common Event Format (CEF) logs to Syslog agent",
-            "description": "Set your security solution to send Syslog messages in CEF format to the proxy machine. Make sure you to send the logs to port 514 TCP on the machine’s IP address."
+            "description": "Set your security solution to send Syslog messages in CEF format to the proxy machine. Make sure you to send the logs to port 514 TCP on the machine's IP address."
         },
         {
             "title": "3. Validate connection",
-            "description": "Follow the instructions to validate your connectivity:\n\nOpen Log Analytics to check if the logs are received using the CommonSecurityLog schema.\n\n>It may take about 20 minutes until the connection streams data to your workspace.\n\nIf the logs are not received, run the following connectivity validation script:\n\n> 1. Make sure that you have Python on your machine using the following command: python –version\n\n>2. You must have elevated permissions (sudo) on your machine",
+            "description": "Follow the instructions to validate your connectivity:\n\nOpen Log Analytics to check if the logs are received using the CommonSecurityLog schema.\n\n>It may take about 20 minutes until the connection streams data to your workspace.\n\nIf the logs are not received, run the following connectivity validation script:\n\n> 1. Make sure that you have Python on your machine using the following command: python -version\n\n>2. You must have elevated permissions (sudo) on your machine",
             "instructions": [
                 {
                     "parameters": {
@@ -90,7 +100,7 @@
                             "WorkspaceId"
                         ],
                         "label": "Run the following command to validate your connectivity:",
-                        "value": "sudo wget https://raw.githubusercontent.com/Azure/Azure-Sentinel/master/DataConnectors/CEF/cef_troubleshoot.py&&sudo python cef_troubleshoot.py  {0}"
+                        "value": "sudo wget  -O cef_troubleshoot.py https://raw.githubusercontent.com/Azure/Azure-Sentinel/master/DataConnectors/CEF/cef_troubleshoot.py&&sudo python cef_troubleshoot.py  {0}"
                     },
                     "type": "CopyableLabel"
                 }

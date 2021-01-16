@@ -5,12 +5,8 @@ description: |
   This query requires you to have Teams data collected from the O365 Management Activity API
   and the Teams parser function enabled.
   More details: https://techcommunity.microsoft.com/t5/azure-sentinel/protecting-your-teams-with-azure-sentinel/ba-p/1265761'
-requiredDataConnectors:
-  - connectorId: CustomConnector
-    dataTypes:
-      - TeamsData
 tactics:
-  - Privilege Escalation
+  - PrivilegeEscalation
 relevantTechniques:
   - T1078
 query: |
@@ -20,7 +16,7 @@ query: |
   // Change this value to adjust how larger timeframe the query is run over.
   let time_window = 1d;
   let high_owner_count = (TeamsData
-  | where TimeGenerated > ago(time_window)
+  | where CreationTime > ago(time_window)
   | where Operation =~ "MemberRoleChanged"
   | extend Member = tostring(parse_json(Members)[0].UPN) 
   | extend NewRole = toint(parse_json(Members)[0].Role) 
@@ -29,7 +25,7 @@ query: |
   | where dcount_TeamName > max_owner_count
   | project Member);
   TeamsData
-  | where TimeGenerated > ago(time_window)
+  | where CreationTime > ago(time_window)
   | where Operation =~ "MemberRoleChanged"
   | extend Member = tostring(parse_json(Members)[0].UPN) 
   | extend NewRole = toint(parse_json(Members)[0].Role) 
@@ -37,4 +33,4 @@ query: |
   | where Member in (high_owner_count)
   | extend TeamGuid = tostring(Details.TeamGuid)
   // Uncomment the following line to map query entities is you plan to use this as a detection query
-  //| extend timestamp = TimeGenerated, AccountCustomEntity = Member
+  //| extend timestamp = CreationTime, AccountCustomEntity = Member
